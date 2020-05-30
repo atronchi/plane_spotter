@@ -19,4 +19,6 @@
 
 ## TODOs
 * stream-process ADS-B and GPYES2 to select an aircraft
-* use kalman filter to 
+* use a kalman filter with AHRS and stepper motors to align the telescope to selected aircraft
+* autofocus?
+
