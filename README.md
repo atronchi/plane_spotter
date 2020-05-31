@@ -24,3 +24,23 @@
 * use a kalman filter with AHRS and stepper motors to align the telescope to selected aircraft
 * autofocus?
 
+
+## Install dependencies
+[Setup rtl-sdr](https://www.rtl-sdr.com/tag/install-guide/)
+sudo apt-get install -y rtl-sdr libusb-1.0-0-dev git cmake
+git clone git://git.osmocom.org/rtl-sdr.git
+mkdir rtl-sdr/build
+cd rtl-sdr/build
+cmake ../ -DINSTALL_UDEV_RULES=ON
+sudo cp ../rtl-sdr.rules /etc/udev/rules.d/
+sudo ldconfig
+echo 'blacklist dvb_usb_rtl28xxu' | sudo tee --append /etc/modprobe.d/blacklist-dvb_usb_rtl28xxu.conf
+
+
+[From flight aware](https://flightaware.com/adsb/piaware/install)
+    wget https://flightaware.com/adsb/piaware/files/packages/pool/piaware/p/piaware-support/piaware-repository_3.8.1_all.deb
+    sudo dpkg -i piaware-repository_3.8.1_all.deb
+    sudo apt-get update && sudo apt-get install -y piaware dump1090-fa dump978-fa
+
+    sudo dump1090-fa --device stx:1090:0
+    sudo dump978-fa --sdr driver=rtlsdr,serial=00000978  --json-stdout
