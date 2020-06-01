@@ -3,6 +3,7 @@
 * Use GPYES to find current location.
 * Determine azimuth/elevation to a chosen aircraft.
 * Actuate stepper motors on telescope mount to actively track the plane.
+* Shoot rad photos with the camera
 
 ## Hardware
 * [Raspberry pi 4](https://www.amazon.com/Raspberry-Model-2019-Quad-Bluetooth/dp/B07TD42S27) ($45)
@@ -27,20 +28,30 @@
 
 ## Install dependencies
 [Setup rtl-sdr](https://www.rtl-sdr.com/tag/install-guide/)
-sudo apt-get install -y rtl-sdr libusb-1.0-0-dev git cmake
-git clone git://git.osmocom.org/rtl-sdr.git
-mkdir rtl-sdr/build
-cd rtl-sdr/build
-cmake ../ -DINSTALL_UDEV_RULES=ON
-sudo cp ../rtl-sdr.rules /etc/udev/rules.d/
-sudo ldconfig
-echo 'blacklist dvb_usb_rtl28xxu' | sudo tee --append /etc/modprobe.d/blacklist-dvb_usb_rtl28xxu.conf
+    sudo apt-get install -y rtl-sdr libusb-1.0-0-dev git cmake
+    git clone git://git.osmocom.org/rtl-sdr.git
+    mkdir rtl-sdr/build
+    cd rtl-sdr/build
+    cmake ../ -DINSTALL_UDEV_RULES=ON
+    sudo cp ../rtl-sdr.rules /etc/udev/rules.d/
+    sudo ldconfig
+    echo 'blacklist dvb_usb_rtl28xxu' | sudo tee --append /etc/modprobe.d/blacklist-dvb_usb_rtl28xxu.conf
 
 
 [From flight aware](https://flightaware.com/adsb/piaware/install)
     wget https://flightaware.com/adsb/piaware/files/packages/pool/piaware/p/piaware-support/piaware-repository_3.8.1_all.deb
     sudo dpkg -i piaware-repository_3.8.1_all.deb
     sudo apt-get update && sudo apt-get install -y piaware dump1090-fa dump978-fa
+    # modify /etc/default/dump{978,1090}-fa as needed
 
-    sudo dump1090-fa --device stx:1090:0
-    sudo dump978-fa --sdr driver=rtlsdr,serial=00000978  --json-stdout
+    # https://discussions.flightaware.com/t/exploring-port-30003-and-30106/27752
+    ps aux | grep dump  # verify that dump1090 and dump978 are running
+
+    #sudo dump1090-fa --device stx:1090:0 --net
+    #http://woodair.net/sbs/Article/Barebones42_Socket_Data.htm
+    #message_type, transmission_type, session_id, aircraft_id, hex_ident, flight_id, msg_date_gen, msg_time_gen, msg_date_log, msg_time_log, \
+    #callsign, altitude, ground_speed, track, lat, lon, vertical_rate, squawk_code, alert, emergency, ident, on_ground
+    nc localhost 30003
+
+    #sudo dump978-fa --sdr driver=rtlsdr,serial=stx:978:0 --json-stdout
+    nc localhost 30979
